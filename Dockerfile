@@ -1,6 +1,6 @@
 FROM ubuntu:14.04
 
-COPY dataset.txt ./home
+COPY datasets.txt ./home
 COPY install_postgres.sh ./home
 
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8
