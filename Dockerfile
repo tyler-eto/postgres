@@ -20,8 +20,8 @@ EXPOSE 5432
 RUN mkdir -p /var/run/postgresql && chown -R postgres /var/run/postgresql
 VOLUME  ["/etc/postgresql", "/var/log/postgresql", "/var/lib/postgresql"]
 
-COPY dataset.txt ./home/dataset.txt
-COPY install_postgres.sh ./home/install_postgres.sh
+COPY dataset.txt ./home
+COPY install_postgres.sh ./home
 
 USER postgres
 CMD ["/usr/lib/postgresql/9.3/bin/postgres", "-D", "/var/lib/postgresql/9.3/main", "-c", "config_file=/etc/postgresql/9.3/main/postgresql.conf", "&&", "./home/install_postgres.sh"]
