@@ -1,6 +1,7 @@
 FROM ubuntu:14.04
 
-COPY datasets.txt /
+RUN apt-get -yq install git
+RUN git clone https://github.com/tyler-eto/postgres
 
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg main" > /etc/apt/sources.list.d/pgdg.list
@@ -20,7 +21,7 @@ RUN /etc/init.d/postgresql start \
 	&& psql -c "CREATE TABLE sublime (id SERIAL PRIMARY KEY, dataset_id INTEGER, dataset_nm VARCHAR, records_acquired INTEGER,
                 records_cleaned INTEGER, status VARCHAR, complete BOOLEAN)" \
 	&& psql -c "GRANT ALL PRIVILEGES ON TABLE sublime TO tyler" \
-	&& psql -c "COPY sublime (dataset_nm, dataset_nm, records_acquired, records_cleaned, status, complete) FROM '/datasets.txt' (DELIMITER(','))"
+	&& psql -c "COPY sublime (dataset_nm, dataset_nm, records_acquired, records_cleaned, status, complete) FROM '/postgres/datasets.txt' (DELIMITER('|'))"
 
 USER root
 RUN echo "host all  all    0.0.0.0/0  md5" >> /etc/postgresql/9.3/main/pg_hba.conf
