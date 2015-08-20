@@ -1,2 +1,2 @@
-1990|ele_c_TYler|0|0|PENDING|FALSE
-1991|gen.res_c_LAcey|0|0|FALSE
+1990,ele_c_TYler,0,0,PENDING,FALSE
+1991,gen.res_c_LAcey,0,0,FALSE
