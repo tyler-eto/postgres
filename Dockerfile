@@ -1,7 +1,7 @@
 FROM ubuntu:14.04
 
 RUN apt-get -yq install git
-RUN git clone https://github.com/tyler-eto/postgres
+RUN git clone https://github.com/tyler-eto/postgres.git
 
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg main" > /etc/apt/sources.list.d/pgdg.list
@@ -16,12 +16,12 @@ RUN /etc/init.d/postgresql start \
 	&& psql -c "ALTER ROLE tyler WITH createdb" \
 	&& psql -c "ALTER ROLE tyler WITH replication" \
 	&& psql -c "ALTER ROLE tyler WITH createrole" \
-	&& psql -c "CREATE DATABASE iterations" \
-	&& psql -c "GRANT ALL PRIVILEGES ON DATABASE iterations TO tyler" \
-	&& psql -c "CREATE TABLE sublime (id SERIAL PRIMARY KEY, dataset_id INTEGER, dataset_nm VARCHAR, records_acquired INTEGER,
+	&& psql -c "CREATE SCHEMA iterations" \
+	&& psql -c "GRANT ALL ON SCHEMA iterations TO tyler" \
+	&& psql -c "GRANT ALL ON ALL TABLES IN SCHEMA iterations TO tyler" \
+	&& psql -c "CREATE TABLE iterations.sublime (id SERIAL PRIMARY KEY, dataset_id INTEGER, dataset_nm VARCHAR, records_acquired INTEGER, \
                 records_cleaned INTEGER, status VARCHAR, complete BOOLEAN)" \
-	&& psql -c "GRANT ALL PRIVILEGES ON TABLE sublime TO tyler" \
-	&& psql -c "COPY sublime (dataset_nm, dataset_nm, records_acquired, records_cleaned, status, complete) FROM '/postgres/datasets.txt' (DELIMITER('|'))"
+	&& psql -c "COPY iterations.sublime (dataset_id, dataset_nm, records_acquired, records_cleaned, status, complete) FROM '/postgres/datasets.txt' (DELIMITER('|'))"
 
 USER root
 RUN echo "host all  all    0.0.0.0/0  md5" >> /etc/postgresql/9.3/main/pg_hba.conf
@@ -33,9 +33,4 @@ RUN mkdir -p /var/run/postgresql && chown -R postgres /var/run/postgresql
 VOLUME  ["/etc/postgresql", "/var/log/postgresql", "/var/lib/postgresql"]
 
 USER postgres
-CMD ["/usr/lib/postgresql/9.3/bin/postgres", "-D", "/var/lib/postgresql/9.3/main", "-c", "config_file=/etc/postgresql/9.3/main/postgresql.conf"]
-
-
-### solve connection issues, can't connect bc it can't find the sublime table, make sure sublime is within iterations db!
-### may not need to create database since it'll just default to "public" schema
-### for psycopg2, just don't use "dbname" argument
+CMD ["/usr/lib/postgresql/9.3/bin/postgres", "-D", "/var/lib/postgresql/9.3/main", "-c", "config_file=/etc/postgresql/9.3/main/postgresql.conf &"]
